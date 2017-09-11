@@ -13,14 +13,19 @@ class ViewController: UIViewController {
     @IBOutlet weak var bigNumber: UILabel!
     var realBigNum:Double?
     var dpVirgin = true
+    var dpTime = false
     @IBOutlet weak var outputStack: UIStackView!
     @IBOutlet weak var inputStacks: UIStackView!
     
     func cleverLabel(newVal:String){
         // Checks if we've set a number yet
-        let buildNewNum:String!
+        var buildNewNum:String!
         if let currentNum:Double = realBigNum {
-            if dpVirgin{
+            if dpTime {
+                buildNewNum = "\(Int(currentNum)).\(newVal)"
+                dpVirgin = false
+                dpTime = false
+            } else if dpVirgin {
                 buildNewNum = "\(Int(currentNum))\(newVal)"
             } else {
                 buildNewNum = "\(currentNum)\(newVal)"
@@ -28,10 +33,9 @@ class ViewController: UIViewController {
         } else {
             buildNewNum = newVal
         }
-        print (buildNewNum)
         if let newBigNum = Double(buildNewNum) {
-            realBigNum = newBigNum
-            bigNumber.text = buildNewNum
+            realBigNum = Double(floor(100*newBigNum)/100)
+            bigNumber.text = String(realBigNum!)
         } else {
             print("Cannot convert \(buildNewNum) to a number double.")
         }
@@ -48,8 +52,13 @@ class ViewController: UIViewController {
             bigNumber.text = "0"
             dpVirgin = true
         case ".":
-            print("You decimaled my point")
-            dpVirgin = false
+            let remainder = realBigNum!.truncatingRemainder(dividingBy:1)
+            if remainder == 0.0{
+                print("You nailed my point")
+                dpTime = true
+            } else {
+                print("Fool me once...")
+            }
         default:
             print ("You pressed the impossible button. Rock on.")
         }
