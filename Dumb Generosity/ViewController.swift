@@ -9,13 +9,63 @@
 import UIKit
 
 class ViewController: UIViewController {
-
     @IBOutlet weak var bigNumber: UILabel!
     var realBigNum:Double?
     var dpVirgin = true
     var dpTime = false
     @IBOutlet weak var outputStack: UIStackView!
     @IBOutlet weak var inputStacks: UIStackView!
+    
+    var tipPercent:Int = 5
+    @IBAction func GoTip(_ sender: UISlider, forEvent event: UIEvent) {
+        let newVal = Int(sender.value)
+        if newVal != tipPercent{
+            tipPercent = newVal
+            cleverOutput()
+        }
+    }
+    
+    var groupSize:Int = 1
+    @IBAction func GroupSize(_ sender: UISlider, forEvent event: UIEvent) {
+        let newVal = Int(sender.value)
+        if newVal != groupSize{
+            groupSize = newVal
+            cleverOutput()
+        }
+    }
+
+    
+    func cleverOutput(){
+        if let theCost = realBigNum{
+            func doMath(per:Int) -> Double{
+                let thePercentage = (Double(per)/100.0) * realBigNum!
+                return thePercentage
+            }
+            var incrimentalPercent = tipPercent;
+            let groupAsDouble = Double(groupSize)
+            for colView in outputStack.arrangedSubviews{
+                var count = 0;
+                for subview in colView.subviews{
+                    if subview is UILabel {
+                        let label = subview as! UILabel
+                        let tipAmm = doMath(per:incrimentalPercent)
+                        switch count{
+                        case 0:
+                            label.text = "\(incrimentalPercent)%"
+                        case 1:
+                            label.text = "\(tipAmm / groupAsDouble)"
+                        case 2:
+                            label.text = "\((tipAmm + realBigNum!) / groupAsDouble)"
+                        default:
+                            print ("I souldn't be here")
+                        }
+                    }
+                    count += 1;
+                }
+                incrimentalPercent += 5;
+            }
+        }
+    }
     
     func cleverLabel(newVal:String){
         // Checks if we've set a number yet
@@ -42,7 +92,7 @@ class ViewController: UIViewController {
         
     }
     
-    @IBAction func buttonClicked(sender:UIButton){
+    @IBAction func numberClicked(sender:UIButton){
         cleverLabel(newVal:sender.currentTitle!)
     }
     @IBAction func otherClicked(sender:UIButton){
@@ -73,15 +123,13 @@ class ViewController: UIViewController {
                     let button = subview as! UIButton
                     let value:String! = button.currentTitle
                     if let _ = Int(value){
-                        button.addTarget(self, action: #selector(buttonClicked(sender:)), for: .touchUpInside)
+                        button.addTarget(self, action: #selector(numberClicked), for: .touchUpInside)
                     } else {
                         button.addTarget(self, action: #selector(otherClicked), for: .touchUpInside)
                     }
                 }
             }
         }
-        // Do any additional setup after loading the view, typically from a nib.
-        //
     }
 
     override func didReceiveMemoryWarning() {
