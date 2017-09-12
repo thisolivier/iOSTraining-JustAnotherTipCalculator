@@ -9,14 +9,16 @@
 import UIKit
 
 class ViewController: UIViewController {
-    @IBOutlet weak var bigNumber: UILabel!
     var realBigNum:Double?
     var dpVirgin = true
     var dpTime = false
+    var tipPercent:Int = 5
+    var groupSize:Int = 1
+    @IBOutlet weak var bigNumber: UILabel!
     @IBOutlet weak var outputStack: UIStackView!
     @IBOutlet weak var inputStacks: UIStackView!
+    @IBOutlet weak var groupSliderLabel: UILabel!
     
-    var tipPercent:Int = 5
     @IBAction func GoTip(_ sender: UISlider, forEvent event: UIEvent) {
         let newVal = Int(sender.value)
         if newVal != tipPercent{
@@ -25,12 +27,37 @@ class ViewController: UIViewController {
         }
     }
     
-    var groupSize:Int = 1
     @IBAction func GroupSize(_ sender: UISlider, forEvent event: UIEvent) {
         let newVal = Int(sender.value)
         if newVal != groupSize{
             groupSize = newVal
+            groupSliderLabel.text = "Group Size: \(newVal)"
             cleverOutput()
+        }
+    }
+    
+    @IBAction func numberClicked(sender:UIButton){
+        cleverLabel(newVal:sender.currentTitle!)
+    }
+    
+    @IBAction func otherClicked(sender:UIButton){
+        switch sender.currentTitle!{
+        case "c":
+            realBigNum = nil
+            bigNumber.text = "0"
+            tipPercent = 5
+            groupSize = 1
+            dpVirgin = true
+        case ".":
+            let remainder = realBigNum!.truncatingRemainder(dividingBy:1)
+            if remainder == 0.0{
+                print("You nailed my point")
+                dpTime = true
+            } else {
+                print("Fool me once...")
+            }
+        default:
+            print ("You pressed the impossible button. Rock on.")
         }
     }
 
@@ -40,6 +67,10 @@ class ViewController: UIViewController {
             func doMath(per:Int) -> Double{
                 let thePercentage = (Double(per)/100.0) * realBigNum!
                 return thePercentage
+            }
+            func makePresentable(inVal:Double) -> String{
+                let returnVal = String.localizedStringWithFormat("%.2f", inVal)
+                return returnVal
             }
             var incrimentalPercent = tipPercent;
             let groupAsDouble = Double(groupSize)
@@ -53,9 +84,11 @@ class ViewController: UIViewController {
                         case 0:
                             label.text = "\(incrimentalPercent)%"
                         case 1:
-                            label.text = "\(tipAmm / groupAsDouble)"
+                            let tipNum = tipAmm / groupAsDouble
+                            label.text = makePresentable(inVal: tipNum)
                         case 2:
-                            label.text = "\((tipAmm + realBigNum!) / groupAsDouble)"
+                            let totalPay = (tipAmm + realBigNum!) / groupAsDouble
+                            label.text = makePresentable(inVal: totalPay)
                         default:
                             print ("I souldn't be here")
                         }
@@ -85,33 +118,16 @@ class ViewController: UIViewController {
         }
         if let newBigNum = Double(buildNewNum) {
             realBigNum = Double(floor(100*newBigNum)/100)
-            bigNumber.text = String(realBigNum!)
+            if dpVirgin{
+                bigNumber.text = String(Int(realBigNum!))
+            } else {
+                bigNumber.text = String(realBigNum!)
+            }
+            cleverOutput()
         } else {
             print("Cannot convert \(buildNewNum) to a number double.")
         }
         
-    }
-    
-    @IBAction func numberClicked(sender:UIButton){
-        cleverLabel(newVal:sender.currentTitle!)
-    }
-    @IBAction func otherClicked(sender:UIButton){
-        switch sender.currentTitle!{
-        case "c":
-            realBigNum = nil
-            bigNumber.text = "0"
-            dpVirgin = true
-        case ".":
-            let remainder = realBigNum!.truncatingRemainder(dividingBy:1)
-            if remainder == 0.0{
-                print("You nailed my point")
-                dpTime = true
-            } else {
-                print("Fool me once...")
-            }
-        default:
-            print ("You pressed the impossible button. Rock on.")
-        }
     }
     
     override func viewDidLoad() {
