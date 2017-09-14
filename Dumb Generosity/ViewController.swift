@@ -48,6 +48,7 @@ class ViewController: UIViewController {
             tipPercent = 5
             groupSize = 1
             dpVirgin = true
+            dpTime = false
         case ".":
             let remainder = realBigNum!.truncatingRemainder(dividingBy:1)
             if remainder == 0.0{
